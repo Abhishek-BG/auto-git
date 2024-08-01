@@ -76,9 +76,14 @@ jobs:
               # Create a file with the commit date
               echo "$commit_date" > LAST_UPDATED
 
-              # Add, commit, and set the commit date
-              git add LAST_UPDATED
-              GIT_COMMITTER_DATE="$commit_date" git commit -m "$commit_message" --date="$commit_date"
+              # Check if there are changes to commit
+              if git diff --quiet; then
+                echo "No changes to commit for $commit_date"
+              else
+                # Add, commit, and set the commit date
+                git add LAST_UPDATED
+                GIT_COMMITTER_DATE="$commit_date" git commit -m "$commit_message" --date="$commit_date"
+              fi
             done
           done
 
