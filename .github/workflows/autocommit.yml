@@ -21,9 +21,10 @@ jobs:
           git config --local user.email "abhigowda0190@gmail.com"
           git config --local user.name "Abhishek-BG"
 
-      - name: Pull Latest Changes
+      - name: Fetch and Rebase
         run: |
-          git pull origin main # Adjust branch name if needed
+          git fetch origin main
+          git rebase origin/main
 
       - name: Generate Commits for the Past Year
         run: |
@@ -67,6 +68,5 @@ jobs:
         run: git log --oneline
 
       - name: Push Changes
-        uses: ad-m/github-push-action@v0.6.0
-        with:
-          github_token: ${{ secrets.auto_commit }}
+        run: |
+          git push origin main --force
