@@ -68,5 +68,7 @@ jobs:
         run: git log --oneline
 
       - name: Push Changes
+        env:
+          GITHUB_TOKEN: ${{ secrets.AUTO_COMMIT}}
         run: |
           git push origin main --force
