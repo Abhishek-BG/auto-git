@@ -3,7 +3,7 @@ name: Auto commit for previous year
 on:
   push:
     branches:
-      - main # Adjust branch name if needed
+      - main
 
 jobs:
   auto_commit:
@@ -13,18 +13,13 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
         with:
-          persist-credentials: false
+          persist-credentials: true
           fetch-depth: 0
 
       - name: Setup Git Config
         run: |
-          git config --local user.email "abhigowda0190@gmail.com"
-          git config --local user.name "Abhishek-BG"
-
-      - name: Fetch and Rebase
-        run: |
-          git fetch origin main
-          git rebase origin/main
+          git config --global user.email "abhigowda0190@gmail.com"
+          git config --global user.name "Abhishek-BG"
 
       - name: Generate Commits for the Past Year
         run: |
@@ -69,6 +64,7 @@ jobs:
 
       - name: Push Changes
         env:
-          GITHUB_TOKEN: ${{ secrets.AUTO_COMMIT}}
+          AUTO_COMMIT: ${{ secrets.AUTO_COMMIT }}
         run: |
+          git remote set-url origin https://x-access-token:${AUTO_COMMIT}@github.com/${{ github.repository }}.git
           git push origin main --force
