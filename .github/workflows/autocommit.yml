@@ -1,12 +1,10 @@
-name: Auto commit for previous years
+name: Remove Commits from August 2024
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
 
 jobs:
-  auto_commit:
+  remove_commits:
     runs-on: ubuntu-latest
 
     steps:
@@ -21,96 +19,21 @@ jobs:
           git config --global user.email "abhigowda0190@gmail.com"
           git config --global user.name "Abhishek-BG"
 
-      - name: Generate Commits for Previous Years
+      - name: Identify and Remove Commits from August 2024
         run: |
-          # Array of commit messages
-          arr=(
-            "Updates"
-            "New Updates"
-            "Fixtures"
-            "Commit"
-            "Updated client folder"
-            "New Commit"
-            "Model"
-            "Recent Updates"
-            "Updated index"
-            "Changes to source"
-            "Refactor code"
-            "Fix bugs"
-            "Improve performance"
-            "Update dependencies"
-            "Add new feature"
-            "Optimize code"
-            "Code cleanup"
-            "Update documentation"
-            "Enhance UI"
-            "Bug fixes and improvements"
-            "Update README"
-            "Improve UX"
-            "Fix typos"
-            "Update configs"
-          )
+          # Identify commits from August 2024
+          commits_to_remove=$(git log --pretty=format:"%H" --since="2024-08-01" --until="2024-12-31" --author="abhigowda0190@gmail.com")
 
-          # Function to generate commits for a specific year
-          generate_commits() {
-            year=$1
-            num_days=$2
-            start_date=$(date -d "$year-01-01" '+%Y-%m-%d')
-            end_date=$(date '+%Y-%m-%d')  # Current date
+          # Check if there are commits to remove
+          if [ -z "$commits_to_remove" ]; then
+            echo "No commits found for August 2024."
+            exit 0
+          fi
 
-            all_dates=()
-
-            # Generate all dates from the start of the year to today
-            while [[ "$start_date" < "$end_date" ]]; do
-              all_dates+=("$start_date")
-              start_date=$(date -d "$start_date + 1 day" '+%Y-%m-%d')
-            done
-
-            # Select random days
-            random_days=($(shuf -e "${all_dates[@]}" -n "$num_days"))
-            
-            # Make commits for each random day
-            for day in "${random_days[@]}"; do
-              num_commits=$((RANDOM % 17 + 1))
-              for ((j = 0; j < num_commits; j++)); do
-                commit_date=$(date -d "$day" '+%Y-%m-%dT%H:%M:%SZ')
-                rand=$((RANDOM % ${#arr[@]}))
-                commit_message="${arr[$rand]} - $commit_date"
-                echo "$commit_date" > LAST_UPDATED
-                if git diff --quiet; then
-                  echo "No changes to commit for $commit_date"
-                else
-                  git add LAST_UPDATED
-                  GIT_COMMITTER_DATE="$commit_date" git commit -m "$commit_message" --date="$commit_date"
-                fi
-              done
-            done
-          }
-
-          # Generate commits for each year except 2024 from the start of the year to the current date
-          generate_commits 2019 150
-          generate_commits 2020 150
-          generate_commits 2021 150
-          generate_commits 2022 150
-
-      - name: Remove Commits for 2024 from Current Date to End of Year
-        run: |
-          # Function to remove commits for 2024 from the current date to end of year
-          remove_commits_2024() {
-            start_date=$(date '+%Y-%m-%d')
-            end_date=$(date -d "2024-12-31" '+%Y-%m-%d')
-
-            # Get all commits after the current date in 2024
-            commits_to_remove=$(git log --pretty=format:"%H" --since="$start_date" --until="2024-12-31" --author="abhigowda0190@gmail.com")
-
-            # Remove each commit
-            for commit in $commits_to_remove; do
-              git rebase --onto $(git rev-list --reverse $commit^..HEAD | head -n 1) $commit^
-            done
-          }
-
-          # Run the function to remove commits
-          remove_commits_2024
+          # Remove each commit
+          for commit in $commits_to_remove; do
+            git rebase --onto $(git rev-list --reverse $commit^..HEAD | head -n 1) $commit^
+          done
 
       - name: Verify Commits
         run: git log --oneline
