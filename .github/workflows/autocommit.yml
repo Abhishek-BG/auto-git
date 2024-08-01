@@ -3,11 +3,12 @@ name: Auto commit for previous year
 on:
   push:
     branches:
-      - master
+      - main # Ensure this matches your default branch
 
 jobs:
   auto_commit:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
