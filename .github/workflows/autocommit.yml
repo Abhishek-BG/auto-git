@@ -87,8 +87,30 @@ jobs:
             done
           }
 
-          # Generate commits for each year
-          generate_commits 2024 120  # Only up to current date
+          # Generate commits for each year except 2024 from the start of the year to the current date
+          generate_commits 2019 150
+          generate_commits 2020 150
+          generate_commits 2021 150
+          generate_commits 2022 150
+
+      - name: Remove Commits for 2024 from Current Date to End of Year
+        run: |
+          # Function to remove commits for 2024 from the current date to end of year
+          remove_commits_2024() {
+            start_date=$(date '+%Y-%m-%d')
+            end_date=$(date -d "2024-12-31" '+%Y-%m-%d')
+
+            # Get all commits after the current date in 2024
+            commits_to_remove=$(git log --pretty=format:"%H" --since="$start_date" --until="2024-12-31" --author="abhigowda0190@gmail.com")
+
+            # Remove each commit
+            for commit in $commits_to_remove; do
+              git rebase --onto $(git rev-list --reverse $commit^..HEAD | head -n 1) $commit^
+            done
+          }
+
+          # Run the function to remove commits
+          remove_commits_2024
 
       - name: Verify Commits
         run: git log --oneline
