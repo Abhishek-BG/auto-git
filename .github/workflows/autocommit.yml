@@ -37,7 +37,6 @@ jobs:
 
           # Push the changes
           git push origin main --force
-          git branch -D backup-branch
 
       - name: Verify Commits
         run: git log --oneline
@@ -48,3 +47,8 @@ jobs:
         run: |
           git remote set-url origin https://x-access-token:${AUTO_COMMIT}@github.com/${{ github.repository }}.git
           git push origin main --force
+
+      - name: Cleanup Backup Branch
+        run: |
+          # Delete the backup branch from remote
+          git push origin --delete backup-branch
