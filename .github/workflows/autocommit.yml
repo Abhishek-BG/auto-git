@@ -23,6 +23,7 @@ jobs:
 
       - name: Generate Commits for the Past Year
         run: |
+          # Array of commit messages
           arr=(
             "Updates"
             "New Updates"
@@ -50,13 +51,35 @@ jobs:
             "Update configs"
           )
 
+          # Number of days to randomly pick
+          days_to_commit=200
+
+          # Create an array of all dates in the past year
+          all_dates=()
           for i in {365..1}; do
-            commit_date=$(date -d "$i days ago" '+%Y-%m-%dT%H:%M:%SZ')
-            rand=$((RANDOM % ${#arr[@]}))
-            commit_message="${arr[$rand]} - $commit_date"
-            echo "$commit_date" > LAST_UPDATED
-            git add LAST_UPDATED
-            GIT_COMMITTER_DATE="$commit_date" git commit -m "$commit_message" --date="$commit_date"
+            all_dates+=("$(date -d "$i days ago" '+%Y-%m-%d')")
+          done
+
+          # Shuffle and pick random days
+          random_days=($(shuf -e "${all_dates[@]}" -n "$days_to_commit"))
+
+          # Iterate over each random day and make a random number of commits
+          for day in "${random_days[@]}"; do
+            # Generate random number of commits for this day (0 to 17)
+            num_commits=$((RANDOM % 18))
+            
+            for ((j = 0; j < num_commits; j++)); do
+              commit_date=$(date -d "$day" '+%Y-%m-%dT%H:%M:%SZ')
+              rand=$((RANDOM % ${#arr[@]}))
+              commit_message="${arr[$rand]} - $commit_date"
+              
+              # Create a file with the commit date
+              echo "$commit_date" > LAST_UPDATED
+
+              # Add, commit, and set the commit date
+              git add LAST_UPDATED
+              GIT_COMMITTER_DATE="$commit_date" git commit -m "$commit_message" --date="$commit_date"
+            done
           done
 
       - name: Verify Commits
