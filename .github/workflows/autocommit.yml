@@ -1,7 +1,9 @@
 name: Remove Commits from August to December 2024
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - main
 
 jobs:
   remove_commits:
