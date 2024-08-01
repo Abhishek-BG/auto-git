@@ -29,7 +29,7 @@ jobs:
 
           # Remove commits from August to December 2024
           git filter-branch --commit-filter '
-            if [ "$(git show -s --format=%ai $GIT_COMMIT)" \> "2024-07-31" ] && [ "$(git show -s --format=%ai $GIT_COMMIT)" \< "2024-12-31" ]; then
+            if [ "$(git show -s --format=%ai $GIT_COMMIT)" \> "2024-08-02" ] && [ "$(git show -s --format=%ai $GIT_COMMIT)" \< "2024-12-31" ]; then
               skip_commit "$@";
             else
               git commit-tree "$@";
