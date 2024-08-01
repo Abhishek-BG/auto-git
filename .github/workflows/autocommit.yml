@@ -87,10 +87,7 @@ jobs:
           }
 
           # Generate commits for each year
-          generate_commits 2019 150
-          generate_commits 2020 150
-          generate_commits 2021 150
-          generate_commits 2022 150
+          generate_commits 2021 100
 
       - name: Verify Commits
         run: git log --oneline
