@@ -27,13 +27,17 @@ jobs:
           git checkout -b backup-branch
           git push origin backup-branch
 
-          # Remove commits from August to December 2024
+          # Remove commits from August 2nd to December 31st, 2024
           git filter-branch --commit-filter '
-            if [ "$(git show -s --format=%ai $GIT_COMMIT)" \> "2024-08-02" ] && [ "$(git show -s --format=%ai $GIT_COMMIT)" \< "2024-12-31" ]; then
+            if [ "$(git show -s --format=%ai $GIT_COMMIT)" \> "2024-08-02" ] && [ "$(git show -s --format=%ai $GIT_COMMIT)" \< "2025-01-01" ]; then
               skip_commit "$@";
             else
               git commit-tree "$@";
             fi' HEAD
+
+          # Push the changes
+          git push origin main --force
+          git branch -D backup-branch
 
       - name: Verify Commits
         run: git log --oneline
