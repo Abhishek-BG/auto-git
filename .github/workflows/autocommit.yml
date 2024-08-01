@@ -9,20 +9,18 @@ jobs:
   auto_commit:
     runs-on: ubuntu-latest
     steps:
-      - name: DEBUG 
-        run: echo "::debug::Ref = ${{github.ref}}"
-        
-      - uses: actions/checkout@v3      
+      - name: Checkout Repository
+        uses: actions/checkout@v3
         with:
           persist-credentials: false
           fetch-depth: 0
 
-      - name: Setup git config
+      - name: Setup Git Config
         run: |
           git config --local user.email "abhigowda0190@gmail.com"
-          git config --local user.name "Abhishek-BG" # Replace 'Your Name' with your actual name
+          git config --local user.name "Abhishek-BG"
 
-      - name: Generate commits for the past year
+      - name: Generate Commits for the Past Year
         run: |
           # Array of commit messages
           arr=(
@@ -69,8 +67,7 @@ jobs:
             GIT_COMMITTER_DATE="$commit_date" git commit -m "$commit_message" --date="$commit_date"
           done
 
-      - name: GitHub Push
+      - name: Push Changes
         uses: ad-m/github-push-action@v0.6.0
         with:
-          directory: "."
           github_token: ${{ secrets.auto_commit }}
