@@ -29,9 +29,11 @@ jobs:
       - name: Remove Commits from August to December 2024
         run: |
           git filter-repo --commit-callback '
-          if commit.committer_date >= "2024-08-01T00:00:00Z" and commit.committer_date <= "2024-12-31T23:59:59Z":
-              commit.skip()' 
-
+          import datetime
+          commit_date = datetime.datetime.fromtimestamp(commit.committer_date).isoformat()
+          if "2024-08-01T00:00:00" <= commit_date <= "2024-12-31T23:59:59":
+              commit.skip()'
+          
       - name: Verify Commits
         run: git log --oneline
 
