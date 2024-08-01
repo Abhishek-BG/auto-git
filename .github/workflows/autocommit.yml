@@ -1,9 +1,7 @@
 name: Auto commit for previous year
 
 on:
-  push:
-    branches:
-      - main # Ensure this matches your default branch
+  workflow_dispatch: # Allows manual triggering of the workflow from the GitHub UI
 
 jobs:
   auto_commit:
@@ -23,7 +21,6 @@ jobs:
 
       - name: Generate Commits for the Past Year
         run: |
-          # Array of commit messages
           arr=(
             "Updates"
             "New Updates"
@@ -51,22 +48,17 @@ jobs:
             "Update configs"
           )
 
-          # Iterate over each day of the previous year
           for i in {365..1}; do
-            # Generate date string for i days ago
             commit_date=$(date -d "$i days ago" '+%Y-%m-%dT%H:%M:%SZ')
-
-            # Select a random commit message
             rand=$((RANDOM % ${#arr[@]}))
             commit_message="${arr[$rand]} - $commit_date"
-
-            # Create a file with the commit date
             echo "$commit_date" > LAST_UPDATED
-
-            # Add, commit, and set the commit date
             git add LAST_UPDATED
             GIT_COMMITTER_DATE="$commit_date" git commit -m "$commit_message" --date="$commit_date"
           done
+
+      - name: Verify Commits
+        run: git log --oneline
 
       - name: Push Changes
         uses: ad-m/github-push-action@v0.6.0
