@@ -1,8 +1,9 @@
 name: Auto commit for previous year
 
 on:
-  workflow_dispatch: # Allows manual triggering of the workflow from the GitHub UI
-
+  push:
+    branches:
+      - main # 
 jobs:
   auto_commit:
     runs-on: ubuntu-latest
