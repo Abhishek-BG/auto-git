@@ -1,0 +1,74 @@
+name: Auto commit for previous year
+
+on:
+  workflow_dispatch: # Allows manual triggering of the workflow from the GitHub UI
+
+jobs:
+  auto_commit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: DEBUG 
+        run: echo "::debug::Ref = ${{github.ref}}"
+        
+      - uses: actions/checkout@v3      
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Setup git config
+        run: |
+          git config --local user.email "abhigowda0190@gmail.com"
+          git config --local user.name "Abhishek-BG" # Replace 'Your Name' with your actual name
+
+      - name: Generate commits for the past year
+        run: |
+          # Array of commit messages
+          arr=(
+            "Updates"
+            "New Updates"
+            "Fixtures"
+            "Commit"
+            "Updated client folder"
+            "New Commit"
+            "Model"
+            "Recent Updates"
+            "Updated index"
+            "Changes to source"
+            "Refactor code"
+            "Fix bugs"
+            "Improve performance"
+            "Update dependencies"
+            "Add new feature"
+            "Optimize code"
+            "Code cleanup"
+            "Update documentation"
+            "Enhance UI"
+            "Bug fixes and improvements"
+            "Update README"
+            "Improve UX"
+            "Fix typos"
+            "Update configs"
+          )
+
+          # Iterate over each day of the previous year
+          for i in {365..1}; do
+            # Generate date string for i days ago
+            commit_date=$(date -d "$i days ago" '+%Y-%m-%dT%H:%M:%SZ')
+
+            # Select a random commit message
+            rand=$((RANDOM % ${#arr[@]}))
+            commit_message="${arr[$rand]} - $commit_date"
+
+            # Create a file with the commit date
+            echo "$commit_date" > LAST_UPDATED
+
+            # Add, commit, and set the commit date
+            git add LAST_UPDATED
+            GIT_COMMITTER_DATE="$commit_date" git commit -m "$commit_message" --date="$commit_date"
+          done
+
+      - name: GitHub Push
+        uses: ad-m/github-push-action@v0.6.0
+        with:
+          directory: "."
+          github_token: ${{ secrets.auto_commit }}
