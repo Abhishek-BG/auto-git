@@ -55,11 +55,12 @@ jobs:
           generate_commits() {
             year=$1
             num_days=$2
-            all_dates=()
             start_date=$(date -d "$year-01-01" '+%Y-%m-%d')
-            end_date=$(date -d "$year-12-31" '+%Y-%m-%d')
+            end_date=$(date '+%Y-%m-%d')  # Current date
 
-            # Generate all dates for the specified year
+            all_dates=()
+
+            # Generate all dates from the start of the year to today
             while [[ "$start_date" < "$end_date" ]]; do
               all_dates+=("$start_date")
               start_date=$(date -d "$start_date + 1 day" '+%Y-%m-%d')
@@ -87,9 +88,7 @@ jobs:
           }
 
           # Generate commits for each year
-          generate_commits 2023 250
-          generate_commits 2024 120
-          
+          generate_commits 2024 120  # Only up to current date
 
       - name: Verify Commits
         run: git log --oneline
