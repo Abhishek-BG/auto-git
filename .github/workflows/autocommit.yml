@@ -21,15 +21,21 @@ jobs:
           git config --global user.email "abhigowda0190@gmail.com"
           git config --global user.name "Abhishek-BG"
 
+      - name: Install git-filter-repo
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y git-filter-repo
+
       - name: Remove Commits from August to December 2024
         run: |
-          # Get all commits from August to December 2024
-          git filter-branch --force --commit-filter '
-          if [ "$(git log -1 --format="%cd" --date=iso | cut -d" " -f1)" \> "2024-07-31" ] && [ "$(git log -1 --format="%cd" --date=iso | cut -d" " -f1)" \< "2025-01-01" ]; then
-              skip
-          else
-              git commit-tree "$@"
-          fi' HEAD
+          git filter-repo --commit-callback '
+          import datetime
+          def commit_callback(commit, aux_info):
+              start_date = datetime.datetime(2024, 8, 1)
+              end_date = datetime.datetime(2024, 12, 31)
+              commit_date = datetime.datetime.fromtimestamp(commit.committer_date)
+              if start_date <= commit_date <= end_date:
+                  commit.skip()' 
 
       - name: Verify Commits
         run: git log --oneline
